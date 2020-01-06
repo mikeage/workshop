@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"workshop/crud"
@@ -24,5 +25,27 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ret)
 	}
 	if r.Method == http.MethodGet {
+		users, err := getAllUsers(w)
+		if err != nil {
+			return
+		}
+		json.NewEncoder(w).Encode(users)
 	}
+}
+
+func getAllUsers(w http.ResponseWriter) ([]types.User, error) {
+	var users []types.User
+	cursor, err := crud.GetAll("users", w)
+
+	if err != nil {
+		return users, err
+	}
+
+	err = cursor.All(context.TODO(), &users)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+	return users, err
+
 }
