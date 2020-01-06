@@ -2,10 +2,12 @@ package crud
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 	"workshop/client"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -31,5 +33,27 @@ func GetAll(collection string, w http.ResponseWriter) (*mongo.Cursor, error) {
 		w.Write([]byte(err.Error()))
 	}
 	return cursor, err
+
+}
+
+// GetOne returns everything from a collection
+func GetOne(collection string, ID string, w http.ResponseWriter) ([]byte, error) {
+	IDobj, err := primitive.ObjectIDFromHex(ID)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+	filter := bson.M{
+		"_id": IDobj,
+	}
+	col := client.GetCollection(collection)
+	dataRaw := bson.M{}
+	err = col.FindOne(context.TODO(), filter).Decode(&dataRaw)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(err.Error()))
+	}
+	data, _ := json.Marshal(dataRaw)
+	return data, err
 
 }

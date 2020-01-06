@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"workshop/crud"
 	"workshop/types"
+
+	"github.com/gorilla/mux"
 )
 
 // UserHandler does something
@@ -25,12 +27,24 @@ func UserHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(ret)
 	}
 	if r.Method == http.MethodGet {
-		users, err := getAllUsers(w)
-		if err != nil {
-			return
+		params := mux.Vars(r)
+		ID := params["id"]
+		if ID == "" {
+			users, err := getAllUsers(w)
+			if err != nil {
+				return
+			}
+			json.NewEncoder(w).Encode(users)
+		} else {
+			user, err := crud.GetOne("users", ID, w)
+			if err != nil {
+				return
+			}
+			w.Write(user)
+			//json.NewEncoder(w).Encode(user)
 		}
-		json.NewEncoder(w).Encode(users)
 	}
+
 }
 
 func getAllUsers(w http.ResponseWriter) ([]types.User, error) {

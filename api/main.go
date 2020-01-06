@@ -12,6 +12,7 @@ func main() {
 	theRouter := mux.NewRouter()
 	theRouter.HandleFunc("/route", handlers.BasicHandler).Methods(http.MethodGet)
 	theRouter.HandleFunc("/user", handlers.UserHandler).Methods(http.MethodGet, http.MethodPost)
+	theRouter.HandleFunc("/user/{id}", handlers.UserHandler).Methods(http.MethodGet)
 	log.Println("The API is listening")
 	http.ListenAndServe(":8083", theRouter)
 }
