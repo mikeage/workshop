@@ -16,14 +16,15 @@ func initClient() {
 	if err != nil {
 		panic(err)
 	}
-
 }
 
-// GetCollection gets a specific collection
+//GetCollection gets the collection from the database
 func GetCollection(collection string) *mongo.Collection {
 	if client == nil {
 		initClient()
 	}
+
 	ucol := client.Database("loanCalc").Collection(collection)
+
 	return ucol
 }

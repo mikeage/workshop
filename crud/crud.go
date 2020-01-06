@@ -6,13 +6,15 @@ import (
 	"net/http"
 	"workshop/client"
 
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Insert inserts stuff
+//Insert will insert a document to the mongoDB
 func Insert(collection string, data interface{}, w http.ResponseWriter) (*mongo.InsertOneResult, error) {
+
 	col := client.GetCollection(collection)
 	result, err := col.InsertOne(context.TODO(), data)
 
@@ -20,40 +22,50 @@ func Insert(collection string, data interface{}, w http.ResponseWriter) (*mongo.
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}
-	return result, err
 
+	return result, err
 }
 
-// GetAll returns everything from a collection
+//GetAll get all the documents
 func GetAll(collection string, w http.ResponseWriter) (*mongo.Cursor, error) {
 	col := client.GetCollection(collection)
+
 	cursor, err := col.Find(context.TODO(), bson.M{})
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
 	}
-	return cursor, err
 
+	return cursor, err
 }
 
-// GetOne returns everything from a collection
-func GetOne(collection string, ID string, w http.ResponseWriter) ([]byte, error) {
+//GetOne gets a single item from the database
+func GetOne(collection, ID string, w http.ResponseWriter) ([]byte, error) {
 	IDobj, err := primitive.ObjectIDFromHex(ID)
+	col := client.GetCollection(collection)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
+		return []byte{}, err
 	}
+
 	filter := bson.M{
 		"_id": IDobj,
 	}
-	col := client.GetCollection(collection)
+
 	dataRaw := bson.M{}
+
 	err = col.FindOne(context.TODO(), filter).Decode(&dataRaw)
+
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(err.Error()))
+		return []byte{}, err
 	}
+
 	data, _ := json.Marshal(dataRaw)
-	return data, err
+	return data, nil
 
 }

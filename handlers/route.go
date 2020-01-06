@@ -5,11 +5,12 @@ import (
 	"net/http"
 )
 
-// BasicHandler does something
+//BasicHandler says "Hello World"
 func BasicHandler(w http.ResponseWriter, r *http.Request) {
 	ret := map[string]string{
-		"key": "Hello world",
+		"key": "Hello World",
 	}
+
 	retRaw, err := json.Marshal(ret)
 
 	if err != nil {
@@ -17,7 +18,8 @@ func BasicHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(err.Error()))
 		return
 	}
+
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(retRaw))
+	w.Write(retRaw)
 
 }
