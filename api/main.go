@@ -15,6 +15,7 @@ func main() {
 	theRouter.HandleFunc("/user", handlers.UserHandler).Methods(http.MethodGet, http.MethodPost)
 	theRouter.HandleFunc("/user/{id}", handlers.UserHandler).Methods(http.MethodGet)
 	theRouter.HandleFunc("/user/{id}/loan/{loanId}", handlers.LoanHandler).Methods(http.MethodPost)
+	theRouter.HandleFunc("/user/{id}/amortization/{loanId}", handlers.AmortizationHandler).Methods(http.MethodGet)
 
 	log.Println("THe API is listining")
 
